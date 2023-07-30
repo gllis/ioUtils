@@ -7,7 +7,7 @@ public interface ClientDispatcher {
      *
      * @param data
      */
-    void receive(String data);
+    void receive(byte[] data);
 
     /**
      * 已连接

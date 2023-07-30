@@ -21,7 +21,7 @@ public interface Client {
     /**
      * 断开连接
      */
-    void disConnect();
+     default void disConnect() {}
 
     /**
      * 发送数据
@@ -34,4 +34,11 @@ public interface Client {
      * 销毁客户端
      */
     void destroy();
+
+    /**
+     * 是否以16进制发送
+     *
+     * @param show
+     */
+    void setIsHexSend(boolean show);
 }

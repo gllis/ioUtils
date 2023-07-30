@@ -36,7 +36,7 @@ public class MainFrame extends JFrame {
         this.tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         NetClientForm tcpClientForm = new NetClientForm(new TcpClient().create());
-        NetClientForm udpClientForm = new NetClientForm(new UdpClient());
+        NetClientForm udpClientForm = new NetClientForm(new UdpClient().create());
         this.tabbedPane.add("TCP客户端", tcpClientForm);
         this.tabbedPane.add("UDP客户端", udpClientForm);
 

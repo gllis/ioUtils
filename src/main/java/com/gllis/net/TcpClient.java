@@ -18,8 +18,8 @@ import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.internal.StringUtil;
 
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * TCP 客户端
@@ -33,6 +33,11 @@ public class TcpClient implements Client {
     private Bootstrap bootstrap;
     private ChannelFuture channelFuture;
     private ClientDispatcher clientDispatcher;
+
+    /**
+     * 是否使用16进制发送
+     */
+    private AtomicBoolean isHexSend = new AtomicBoolean(true);
 
     @Override
     public TcpClient setListener(ClientDispatcher clientDispatcher) {
@@ -54,6 +59,7 @@ public class TcpClient implements Client {
         initOptions(bootstrap);
         return this;
     }
+
     @Override
     public void connect(String host, Integer port) {
         try {
@@ -107,6 +113,12 @@ public class TcpClient implements Client {
         }
     }
 
+
+    @Override
+    public void setIsHexSend(boolean show) {
+        this.isHexSend.getAndSet(show);
+    }
+
     private void initPipeline(ChannelPipeline pipeline) {
         ClientHandler clientHandler = new ClientHandler();
         pipeline.addLast(new IdleStateHandler(10, 0, 10, TimeUnit.MINUTES));
@@ -121,11 +133,11 @@ public class TcpClient implements Client {
         b.option(ChannelOption.TCP_NODELAY, true);
     }
 
-    public class ClientHandler extends ChannelInboundHandlerAdapter {
+    class ClientHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            byte[] bytes = (byte[]) msg;
-            clientDispatcher.receive(HexUtil.convertByteToHex(bytes).toUpperCase(Locale.ROOT));
+            byte[] data = (byte[]) msg;
+            clientDispatcher.receive(data);
         }
 
         @Override
