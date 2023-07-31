@@ -32,6 +32,12 @@ public class ComponentUtil {
         setPreferSizeAndLocateToCenter(component, preferWidth, preferHeight);
     }
 
+    public static void setPreferSizeAndLocateToCenter(Component component) {
+        int preferWidth = component.getWidth();
+        int preferHeight = component.getHeight();
+        setPreferSizeAndLocateToCenter(component, preferWidth, preferHeight);
+    }
+
     public static void setPreferredSize() {
 
     }

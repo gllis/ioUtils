@@ -1,6 +1,8 @@
 package com.gllis.net;
 
 
+import com.gllis.conf.AppConstant;
+import com.gllis.util.AppConfUtils;
 import com.gllis.util.HexUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -18,6 +20,7 @@ import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.internal.StringUtil;
 
+import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,6 +37,9 @@ public class TcpClient implements Client {
     private ChannelFuture channelFuture;
     private ClientDispatcher clientDispatcher;
 
+    private String host;
+    private Integer port;
+
     /**
      * 是否使用16进制发送
      */
@@ -43,6 +49,11 @@ public class TcpClient implements Client {
     public TcpClient setListener(ClientDispatcher clientDispatcher) {
         this.clientDispatcher = clientDispatcher;
         return this;
+    }
+
+    @Override
+    public String getHostInfo() {
+        return MessageFormat.format("{0}:{1}", host, String.valueOf(port));
     }
 
     public TcpClient create() {
@@ -63,7 +74,11 @@ public class TcpClient implements Client {
     @Override
     public void connect(String host, Integer port) {
         try {
+            this.host = host;
+            this.port = port;
             channelFuture = bootstrap.connect(host, port).sync();
+            AppConfUtils.update(AppConstant.TCP_IP, host);
+            AppConfUtils.update(AppConstant.TCP_PORT, port);
         } catch (Exception e) {
             e.printStackTrace();
             clientDispatcher.alertMsg("请求连接服务器失败！");
@@ -95,6 +110,7 @@ public class TcpClient implements Client {
         try {
             byte[] bytes = HexUtil.convertHexToByte(content);
             channelFuture.channel().writeAndFlush(bytes);
+            AppConfUtils.update(AppConstant.TCP_LAST_SEND, content);
         } catch (Exception e) {
             e.printStackTrace();
             clientDispatcher.alertMsg("发送失败！");

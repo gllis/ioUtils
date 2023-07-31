@@ -12,5 +12,5 @@ public interface UiConstant {
     String APP_VERSION = "1.0.0";
 
     int COMPONENT_HEIGHT = 30;
-    int COMPONENT_BUTTON_WIDTH = 80;
+    String GITHUB = "https://github.com/gllis/ioUtils";
 }

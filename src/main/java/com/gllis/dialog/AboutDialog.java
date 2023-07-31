@@ -8,6 +8,7 @@ import com.gllis.conf.UiConstant;
 import com.gllis.util.ComponentUtil;
 
 import java.awt.*;
+import java.text.MessageFormat;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -43,7 +44,8 @@ public class AboutDialog extends JDialog {
                 contentPanel.setLayout(new FlowLayout());
             }
             dialogPane.add(contentPanel, BorderLayout.CENTER);
-            contentPanel.add(new Label("111"));
+            contentPanel.add(new JLabel(MessageFormat.format("<html><body>{0}: v{1}<br/>github : <a href='{2}'>{2}</a><body></html>",
+                    UiConstant.APP_NAME, UiConstant.APP_VERSION, UiConstant.GITHUB)));
             //======== buttonBar ========
             {
                 buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
@@ -67,7 +69,7 @@ public class AboutDialog extends JDialog {
         }
         contentPane.add(dialogPane, BorderLayout.CENTER);
         pack();
-        ComponentUtil.setPreferSizeAndLocateToCenter(this, 0.5, 0.5);
+        ComponentUtil.setPreferSizeAndLocateToCenter(this);
         setResizable(false);
         setTitle("About " + UiConstant.APP_NAME);
 

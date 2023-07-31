@@ -1,15 +1,21 @@
 package com.gllis.form;
 
+import com.gllis.conf.AppConstant;
 import com.gllis.conf.UiConstant;
 import com.gllis.net.Client;
 import com.gllis.net.ClientDispatcher;
+import com.gllis.net.TcpClient;
 import com.gllis.net.UdpClient;
+import com.gllis.util.AppConfUtils;
+import com.gllis.util.DateUtil;
 import com.gllis.util.HexUtil;
 import io.netty.util.internal.StringUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.IOException;
+import java.text.MessageFormat;
 
 import static javax.swing.JOptionPane.showMessageDialog;
 
@@ -31,8 +37,10 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
      * 连接按钮
      */
     private JButton btnConnect;
-
-    private boolean isHexReceive;
+    /**
+     * 是否以16进制接收
+     */
+    private boolean isHexReceive = true;
 
     /**
      * 客户端
@@ -96,9 +104,21 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         this.add(labHexReceive);
 
         taReceive = new JTextArea();
-        taReceive.setBounds(10, 75, 600, 220);
         taReceive.setFont(new Font(null, 0, 22));
-        this.add(taReceive);
+        taReceive.setLineWrap(true);
+        taReceive.setWrapStyleWord(true);
+        taReceive.setEditable(false);
+
+        JScrollPane receivePanel = new JScrollPane(taReceive);
+        receivePanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        receivePanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        receivePanel.setBounds(10, 75, 680, 220);
+        this.add(receivePanel);
+
+        JButton btnClear = new JButton("清空");
+        btnClear.setBounds(700, 265, 80, UiConstant.COMPONENT_HEIGHT);
+        this.add(btnClear);
+        btnClear.addActionListener( l -> taReceive.setText(null));
 
         JCheckBox hexSend = new JCheckBox();
         hexSend.setSelected(true);
@@ -110,12 +130,17 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         this.add(labHexSend);
 
         JTextArea taSend = new JTextArea();
-        taSend.setBounds(10, 340, 600, 120);
         taSend.setFont(new Font(null, 0, 22));
-        this.add(taSend);
+        taSend.setLineWrap(true);
+        taSend.setWrapStyleWord(true);
+        JScrollPane sendPane = new JScrollPane(taSend);
+        sendPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        sendPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        sendPane.setBounds(10, 340, 680, 120);
+        this.add(sendPane);
 
         JButton btnSend = new JButton("发送");
-        btnSend.setBounds(620, 430, 80, UiConstant.COMPONENT_HEIGHT);
+        btnSend.setBounds(700, 430, 80, UiConstant.COMPONENT_HEIGHT);
         this.add(btnSend);
         btnSend.addActionListener(e -> {
             if (client instanceof UdpClient) {
@@ -128,11 +153,41 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
             }
             client.sendMsg(taSend.getText());
         });
+
+        initClientLastRecord(tIp, tPort, taSend);
+    }
+
+    /**
+     * 初始化上次发送记录
+     *
+     * @param tIp
+     * @param tPort
+     * @param taSend
+     */
+    private void initClientLastRecord(JTextField tIp, JTextField tPort, JTextArea taSend) {
+        try {
+            if (client instanceof TcpClient) {
+                tIp.setText(AppConfUtils.get().getProperty(AppConstant.TCP_IP));
+                tPort.setText(AppConfUtils.get().getProperty(AppConstant.TCP_PORT));
+                taSend.setText(AppConfUtils.get().getProperty(AppConstant.TCP_LAST_SEND));
+            } else {
+                tIp.setText(AppConfUtils.get().getProperty(AppConstant.UDP_IP));
+                tPort.setText(AppConfUtils.get().getProperty(AppConstant.UDP_PORT));
+                taSend.setText(AppConfUtils.get().getProperty(AppConstant.UDP_LAST_SEND));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void receive(byte[] data) {
+        if (data == null || data.length == 0) {
+            return;
+        }
         String result = isHexReceive ? HexUtil.convertByteToHex(data) : new String(data);
+        taReceive.append(MessageFormat.format("{0} [{1}]", client.getHostInfo(), DateUtil.now()));
+        taReceive.append("\n");
         taReceive.append(result);
         taReceive.append("\n");
     }

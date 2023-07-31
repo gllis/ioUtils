@@ -1,7 +1,11 @@
 package com.gllis.net;
 
+import com.gllis.conf.AppConstant;
+import com.gllis.util.AppConfUtils;
 import com.gllis.util.HexUtil;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -15,6 +19,7 @@ import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 
 import java.net.InetSocketAddress;
+import java.text.MessageFormat;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -49,27 +54,24 @@ public class UdpClient implements Client {
         return this;
     }
 
+    @Override
+    public String getHostInfo() {
+        return MessageFormat.format("{0}:{1}", host, String.valueOf(port));
+    }
+
     public Client create() {
         this.workerGroup = new NioEventLoopGroup();
         this.bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
                 .channel(NioDatagramChannel.class)
-                .option(ChannelOption.SO_BROADCAST, true)     // 广播
-                .option(ChannelOption.SO_RCVBUF, 2048 * 1024) // 设置UDP读缓冲区为2M
-                .option(ChannelOption.SO_SNDBUF, 1024 * 1024);// 设置UDP写缓冲区为1M;
-        bootstrap.handler(new ChannelInitializer<Channel>() {
-            @Override
-            public void initChannel(Channel ch) throws Exception {
-                ch.pipeline().addLast(new ClientHandler());
-            }
-        });
+                .option(ChannelOption.SO_BROADCAST, true);     // 广播
+        bootstrap.handler(new ClientHandler());
+
 
         try {
-            channelFuture = bootstrap.bind(1200).sync();
+            channelFuture = bootstrap.bind(0).sync();
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            workerGroup.shutdownGracefully();
         }
         return this;
     }
@@ -78,6 +80,8 @@ public class UdpClient implements Client {
     public void connect(String host, Integer port) {
         this.host = host;
         this.port = port;
+        AppConfUtils.update(AppConstant.UDP_IP, host);
+        AppConfUtils.update(AppConstant.UDP_PORT, port);
     }
 
 
@@ -86,6 +90,8 @@ public class UdpClient implements Client {
         byte[] data = isHexSend.get() ? HexUtil.convertHexToByte(content) : content.getBytes();
         channelFuture.channel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(data),
                 new InetSocketAddress(host, port)));
+        AppConfUtils.update(AppConstant.UDP_LAST_SEND, content);
+
     }
 
     @Override
@@ -111,7 +117,9 @@ public class UdpClient implements Client {
 
         @Override
         protected void channelRead0(ChannelHandlerContext channelHandlerContext, DatagramPacket datagramPacket) throws Exception {
-            byte[] data = datagramPacket.content().array();
+            ByteBuf buf = datagramPacket.content();
+            byte[] data = new byte[buf.readableBytes()];
+            buf.readBytes(data);
             clientDispatcher.receive(data);
         }
     }

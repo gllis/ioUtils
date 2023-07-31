@@ -11,6 +11,12 @@ public interface Client {
     Client setListener(ClientDispatcher clientDispatcher);
 
     /**
+     * 获取主机信息
+     *
+     * @return
+     */
+    String getHostInfo();
+    /**
      * 连接
      *
      * @param host
