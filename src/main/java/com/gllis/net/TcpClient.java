@@ -77,8 +77,7 @@ public class TcpClient implements Client {
             this.host = host;
             this.port = port;
             channelFuture = bootstrap.connect(host, port).sync();
-            AppConfUtils.update(AppConstant.TCP_IP, host);
-            AppConfUtils.update(AppConstant.TCP_PORT, port);
+            AppConfUtils.updateHost(AppConstant.TCP_HOST, host, port);
         } catch (Exception e) {
             e.printStackTrace();
             clientDispatcher.alertMsg("请求连接服务器失败！");

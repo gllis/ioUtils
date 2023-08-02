@@ -1,6 +1,7 @@
 package com.gllis.util;
 
 import com.gllis.conf.AppConstant;
+import io.netty.util.internal.StringUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,6 +33,53 @@ public class AppConfUtils {
     }
 
     /**
+     * 获取host列表
+     *
+     * @param key
+     * @return
+     */
+    public static String[] getHosts(String key) {
+        String[] hosts;
+        try {
+            String value = get().getProperty(key);
+            if (!StringUtil.isNullOrEmpty(value)) {
+                String[] tmpArr = value.split(",", 5);
+                hosts = new String[tmpArr.length];
+                for (int i = 0; i < tmpArr.length; i++) {
+                    hosts[i] = tmpArr[i].split(":")[0];
+                }
+            } else {
+                hosts = new String[]{};
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return hosts;
+    }
+
+    /**
+     * 获取端口
+     *
+     * @param key
+     * @return
+     */
+    public static String getPort(String key) {
+        String port = null;
+        try {
+            String value = get().getProperty(key);
+            if (!StringUtil.isNullOrEmpty(value)) {
+                String[] tmpArr = value.split(",", 5);
+                if (tmpArr.length > 0) {
+                    port = tmpArr[0].split(":")[1];
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return port;
+    }
+
+    /**
      * 更新配置
      *
      * @param key
@@ -49,6 +97,38 @@ public class AppConfUtils {
             props.store(fos, "Update '" + key + "' value");
         } catch (IOException e) {
             System.err.println("属性文件更新错误");
+        }
+    }
+
+    /**
+     * 更新host 记录 最多记录5条记录
+     *
+     * @param host
+     * @param port
+     */
+    public static void updateHost(String key, String host, Integer port) {
+        try {
+            String hosts = get().getProperty(key);
+            String hostKey = String.format("%s:%s", host, port);
+            if (hosts == null) {
+                update(key, hostKey);
+                return;
+            }
+            if (hosts.contains(hostKey)) {
+                return;
+            }
+            String[] hostArr = hosts.split(",", 5);
+            StringBuilder sb = new StringBuilder(hostKey);
+            int len = hostArr.length >= 5 ? 4 : hostArr.length;
+            for (int i = 0; i < len; i++) {
+                String[] tmp = hostArr[i].split(":");
+                sb.append(",");
+                sb.append(String.format("%s:%s", tmp[0], tmp[1]));
+            }
+            update(key, sb.toString());
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

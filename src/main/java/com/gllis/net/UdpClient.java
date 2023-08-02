@@ -80,8 +80,7 @@ public class UdpClient implements Client {
     public void connect(String host, Integer port) {
         this.host = host;
         this.port = port;
-        AppConfUtils.update(AppConstant.UDP_IP, host);
-        AppConfUtils.update(AppConstant.UDP_PORT, port);
+        AppConfUtils.updateHost(AppConstant.UDP_HOST, host, port);
     }
 
 

@@ -51,23 +51,28 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         super();
         this.client = client;
         this.client.setListener(this);
-        init();
+        try {
+            init();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * 初始化UI
      */
-    private void init() {
+    private void init() throws IOException {
 
         this.setLayout(null);
         this.setBorder(new EmptyBorder(5,5,5,5));
         JLabel lIp = new JLabel("远程主机：");
         lIp.setBounds(10, 10, 80, UiConstant.COMPONENT_HEIGHT);
         this.add(lIp);
-        JTextField tIp = new JTextField();
-        tIp.setBounds(80, 10, 200, UiConstant.COMPONENT_HEIGHT);
-        this.add(tIp);
-        tIp.setColumns(10);
+        JComboBox<String> cIp = new JComboBox<>();
+        cIp.setEditable(true);
+        cIp.setBounds(80, 10, 200, UiConstant.COMPONENT_HEIGHT);
+        this.add(cIp);
+
         JLabel lPort = new JLabel("端口：");
         lPort.setBounds(290, 10, 90, UiConstant.COMPONENT_HEIGHT);
         this.add(lPort);
@@ -84,11 +89,12 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
                 client.disConnect();
                 return;
             }
-            if (StringUtil.isNullOrEmpty(tIp.getText()) || StringUtil.isNullOrEmpty(tPort.getText())) {
+            String ip = (String) cIp.getSelectedItem();
+            if (StringUtil.isNullOrEmpty(ip) || StringUtil.isNullOrEmpty(tPort.getText())) {
                 showMessageDialog(null, "请输入Ip或端口");
                 return;
             }
-            client.connect(tIp.getText().trim(), Integer.parseInt(tPort.getText()));
+            client.connect(ip.trim(), Integer.parseInt(tPort.getText()));
         });
         if (client instanceof UdpClient) {
             btnConnect.setVisible(false);
@@ -144,35 +150,36 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         this.add(btnSend);
         btnSend.addActionListener(e -> {
             if (client instanceof UdpClient) {
-                if (StringUtil.isNullOrEmpty(tIp.getText())
+                String ip = (String) cIp.getSelectedItem();
+                if (StringUtil.isNullOrEmpty(ip)
                         || StringUtil.isNullOrEmpty(tPort.getText())) {
                     showMessageDialog(null, "请输入Ip或端口");
                     return;
                 }
-                client.connect(tIp.getText(), Integer.parseInt(tPort.getText()));
+                client.connect(ip.trim(), Integer.parseInt(tPort.getText()));
             }
             client.sendMsg(taSend.getText());
         });
 
-        initClientLastRecord(tIp, tPort, taSend);
+        initClientLastRecord(cIp, tPort, taSend);
     }
 
     /**
      * 初始化上次发送记录
      *
-     * @param tIp
+     * @param cIp
      * @param tPort
      * @param taSend
      */
-    private void initClientLastRecord(JTextField tIp, JTextField tPort, JTextArea taSend) {
+    private void initClientLastRecord(JComboBox<String> cIp, JTextField tPort, JTextArea taSend) {
         try {
             if (client instanceof TcpClient) {
-                tIp.setText(AppConfUtils.get().getProperty(AppConstant.TCP_IP));
-                tPort.setText(AppConfUtils.get().getProperty(AppConstant.TCP_PORT));
+                cIp.setModel(new DefaultComboBoxModel<>(AppConfUtils.getHosts(AppConstant.TCP_HOST)));
+                tPort.setText(AppConfUtils.getPort(AppConstant.TCP_HOST));
                 taSend.setText(AppConfUtils.get().getProperty(AppConstant.TCP_LAST_SEND));
             } else {
-                tIp.setText(AppConfUtils.get().getProperty(AppConstant.UDP_IP));
-                tPort.setText(AppConfUtils.get().getProperty(AppConstant.UDP_PORT));
+                cIp.setModel(new DefaultComboBoxModel<>(AppConfUtils.getHosts(AppConstant.UDP_HOST)));
+                tPort.setText(AppConfUtils.getPort(AppConstant.UDP_HOST));
                 taSend.setText(AppConfUtils.get().getProperty(AppConstant.UDP_LAST_SEND));
             }
         } catch (IOException e) {
