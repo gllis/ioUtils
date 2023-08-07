@@ -78,6 +78,7 @@ public class TcpClient implements Client {
             this.port = port;
             channelFuture = bootstrap.connect(host, port).sync();
             AppConfUtils.updateHost(AppConstant.TCP_HOST, host, port);
+            clientDispatcher.updateIpArray(AppConfUtils.getHosts(AppConstant.TCP_HOST));
         } catch (Exception e) {
             e.printStackTrace();
             clientDispatcher.alertMsg("请求连接服务器失败！");
@@ -116,17 +117,7 @@ public class TcpClient implements Client {
         }
     }
 
-    @Override
-    public void destroy() {
-        try {
-            if (channelFuture != null && channelFuture.channel().isActive()) {
-                channelFuture.channel().close().syncUninterruptibly();
-            }
-            workerGroup.shutdownGracefully().syncUninterruptibly();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 
 
     @Override

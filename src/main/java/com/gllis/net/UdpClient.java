@@ -81,6 +81,7 @@ public class UdpClient implements Client {
         this.host = host;
         this.port = port;
         AppConfUtils.updateHost(AppConstant.UDP_HOST, host, port);
+        clientDispatcher.updateIpArray(AppConfUtils.getHosts(AppConstant.UDP_HOST));
     }
 
 
@@ -93,17 +94,7 @@ public class UdpClient implements Client {
 
     }
 
-    @Override
-    public void destroy() {
-        try {
-            if (channelFuture != null && channelFuture.channel().isActive()) {
-                channelFuture.channel().close().syncUninterruptibly();
-            }
-            workerGroup.shutdownGracefully().syncUninterruptibly();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 
 
     @Override

@@ -25,4 +25,10 @@ public interface ClientDispatcher {
      * @param msg
      */
     void alertMsg(String msg);
+
+    /**
+     * 更新ip列表
+     * @param ipArray
+     */
+    void updateIpArray(String[] ipArray);
 }

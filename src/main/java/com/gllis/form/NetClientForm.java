@@ -38,6 +38,10 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
      */
     private JButton btnConnect;
     /**
+     * ip选择器
+     */
+    private JComboBox<String> cIp;
+    /**
      * 是否以16进制接收
      */
     private boolean isHexReceive = true;
@@ -68,7 +72,7 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         JLabel lIp = new JLabel("远程主机：");
         lIp.setBounds(10, 10, 80, UiConstant.COMPONENT_HEIGHT);
         this.add(lIp);
-        JComboBox<String> cIp = new JComboBox<>();
+        cIp = new JComboBox<>();
         cIp.setEditable(true);
         cIp.setBounds(80, 10, 200, UiConstant.COMPONENT_HEIGHT);
         this.add(cIp);
@@ -212,5 +216,10 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
     @Override
     public void alertMsg(String msg) {
         showMessageDialog(null, msg);
+    }
+
+    @Override
+    public void updateIpArray(String[] ipArray) {
+        cIp.setModel(new DefaultComboBoxModel<>(ipArray));
     }
 }

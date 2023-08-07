@@ -36,10 +36,6 @@ public interface Client {
      */
     void sendMsg(String content);
 
-    /**
-     * 销毁客户端
-     */
-    void destroy();
 
     /**
      * 是否以16进制发送
@@ -47,4 +43,6 @@ public interface Client {
      * @param show
      */
     void setIsHexSend(boolean show);
+
+
 }
