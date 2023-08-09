@@ -17,6 +17,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.util.internal.StringUtil;
 
 import java.net.InetSocketAddress;
 import java.text.MessageFormat;
@@ -87,7 +88,11 @@ public class UdpClient implements Client {
 
     @Override
     public void sendMsg(String content) {
-        byte[] data = isHexSend.get() ? HexUtil.convertHexToByte(content) : content.getBytes();
+        if (StringUtil.isNullOrEmpty(content)) {
+            clientDispatcher.alertMsg("发送内容为空！");
+            return;
+        }
+        byte[] data = isHexSend.get() ? HexUtil.convertHexToByte(content.trim()) : content.trim().getBytes();
         channelFuture.channel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(data),
                 new InetSocketAddress(host, port)));
         AppConfUtils.update(AppConstant.UDP_LAST_SEND, content);

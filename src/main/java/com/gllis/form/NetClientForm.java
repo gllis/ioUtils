@@ -77,6 +77,7 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         cIp.setBounds(80, 10, 200, UiConstant.COMPONENT_HEIGHT);
         this.add(cIp);
 
+
         JLabel lPort = new JLabel("端口：");
         lPort.setBounds(290, 10, 90, UiConstant.COMPONENT_HEIGHT);
         this.add(lPort);
@@ -84,6 +85,11 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         tPort.setBounds(330, 10, 80, UiConstant.COMPONENT_HEIGHT);
         this.add(tPort);
         tPort.setColumns(10);
+
+
+        cIp.addActionListener(l -> {
+            changeIp(tPort);
+        });
 
         btnConnect = new JButton("连接");
         btnConnect.setBounds(420, 10, 80, UiConstant.COMPONENT_HEIGHT);
@@ -179,15 +185,35 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         try {
             if (client instanceof TcpClient) {
                 cIp.setModel(new DefaultComboBoxModel<>(AppConfUtils.getHosts(AppConstant.TCP_HOST)));
-                tPort.setText(AppConfUtils.getPort(AppConstant.TCP_HOST));
+                String ip = (String) cIp.getSelectedItem();
+                tPort.setText(AppConfUtils.getPort(AppConstant.TCP_HOST, ip));
                 taSend.setText(AppConfUtils.get().getProperty(AppConstant.TCP_LAST_SEND));
             } else {
                 cIp.setModel(new DefaultComboBoxModel<>(AppConfUtils.getHosts(AppConstant.UDP_HOST)));
-                tPort.setText(AppConfUtils.getPort(AppConstant.UDP_HOST));
+                String ip = (String) cIp.getSelectedItem();
+                tPort.setText(AppConfUtils.getPort(AppConstant.UDP_HOST, ip));
                 taSend.setText(AppConfUtils.get().getProperty(AppConstant.UDP_LAST_SEND));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * ip 改变事件
+     * @param tPort
+     */
+    private void changeIp(JTextField tPort) {
+        try {
+            if (client instanceof TcpClient) {
+                String ip = (String) cIp.getSelectedItem();
+                tPort.setText(AppConfUtils.getPort(AppConstant.TCP_HOST, ip));
+            } else {
+                String ip = (String) cIp.getSelectedItem();
+                tPort.setText(AppConfUtils.getPort(AppConstant.UDP_HOST, ip));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

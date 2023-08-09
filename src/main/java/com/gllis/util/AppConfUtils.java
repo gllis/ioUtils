@@ -63,14 +63,21 @@ public class AppConfUtils {
      * @param key
      * @return
      */
-    public static String getPort(String key) {
+    public static String getPort(String key, String ip) {
+        if (ip == null) {
+            return null;
+        }
         String port = null;
         try {
             String value = get().getProperty(key);
             if (!StringUtil.isNullOrEmpty(value)) {
                 String[] tmpArr = value.split(",", 5);
-                if (tmpArr.length > 0) {
-                    port = tmpArr[0].split(":")[1];
+                for (String tmp : tmpArr) {
+                    String[] ips = tmp.split(":");
+                    if (ip.equals(ips[0])) {
+                        port = ips[1];
+                        break;
+                    }
                 }
             }
         } catch (IOException e) {
