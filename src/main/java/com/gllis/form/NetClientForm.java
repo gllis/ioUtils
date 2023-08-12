@@ -120,7 +120,7 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         this.add(labHexReceive);
 
         taReceive = new JTextArea();
-        taReceive.setFont(new Font(null, 0, 22));
+        taReceive.setFont(new Font(null, 0, 16));
         taReceive.setLineWrap(true);
         taReceive.setWrapStyleWord(true);
         taReceive.setEditable(false);
@@ -146,7 +146,7 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         this.add(labHexSend);
 
         JTextArea taSend = new JTextArea();
-        taSend.setFont(new Font(null, 0, 22));
+        taSend.setFont(new Font(null, 0, 16));
         taSend.setLineWrap(true);
         taSend.setWrapStyleWord(true);
         JScrollPane sendPane = new JScrollPane(taSend);

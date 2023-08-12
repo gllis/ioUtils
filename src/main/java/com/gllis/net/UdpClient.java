@@ -92,7 +92,8 @@ public class UdpClient implements Client {
             clientDispatcher.alertMsg("发送内容为空！");
             return;
         }
-        byte[] data = isHexSend.get() ? HexUtil.convertHexToByte(content.trim()) : content.trim().getBytes();
+        byte[] data = isHexSend.get() ? HexUtil.convertHexToByte(content.trim().toUpperCase())
+                : content.trim().getBytes();
         channelFuture.channel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(data),
                 new InetSocketAddress(host, port)));
         AppConfUtils.update(AppConstant.UDP_LAST_SEND, content);

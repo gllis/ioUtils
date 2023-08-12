@@ -2,6 +2,7 @@ package com.gllis.frame;
 
 import com.gllis.conf.UiConstant;
 import com.gllis.dialog.AboutDialog;
+import com.gllis.form.HexToolForm;
 import com.gllis.form.NetClientForm;
 import com.gllis.net.TcpClient;
 import com.gllis.net.UdpClient;
@@ -35,10 +36,9 @@ public class MainFrame extends JFrame {
         this.tabbedPane = new JTabbedPane();
         this.tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        NetClientForm tcpClientForm = new NetClientForm(new TcpClient().create());
-        NetClientForm udpClientForm = new NetClientForm(new UdpClient().create());
-        this.tabbedPane.add("TCP客户端", tcpClientForm);
-        this.tabbedPane.add("UDP客户端", udpClientForm);
+        this.tabbedPane.add("TCP客户端", new NetClientForm(new TcpClient().create()));
+        this.tabbedPane.add("UDP客户端", new NetClientForm(new UdpClient().create()));
+        this.tabbedPane.add("16进制转换", new HexToolForm());
 
         JPanel contentPanel = new JPanel(new BorderLayout());
         if (SystemUtil.isMacOs()) {
