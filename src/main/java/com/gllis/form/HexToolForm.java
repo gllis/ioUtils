@@ -150,7 +150,7 @@ public class HexToolForm extends JPanel {
                 showMessageDialog(null, "内容不能为空！");
                 return;
             }
-            String content = oriHexArea.getText().trim().toUpperCase();
+            String content = oriHexArea.getText().trim();
             int i = 0;
             StringBuilder rs = new StringBuilder();
             for (char c : content.toCharArray()) {

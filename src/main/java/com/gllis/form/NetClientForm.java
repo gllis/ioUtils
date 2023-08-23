@@ -87,9 +87,7 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         tPort.setColumns(10);
 
 
-        cIp.addActionListener(l -> {
-            changeIp(tPort);
-        });
+        cIp.addActionListener(l -> changeIp(tPort));
 
         btnConnect = new JButton("连接");
         btnConnect.setBounds(420, 10, 80, UiConstant.COMPONENT_HEIGHT);
@@ -185,13 +183,11 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
         try {
             if (client instanceof TcpClient) {
                 cIp.setModel(new DefaultComboBoxModel<>(AppConfUtils.getHosts(AppConstant.TCP_HOST)));
-                String ip = (String) cIp.getSelectedItem();
-                tPort.setText(AppConfUtils.getPort(AppConstant.TCP_HOST, ip));
+                tPort.setText(AppConfUtils.getPort(AppConstant.TCP_HOST, cIp.getSelectedIndex()));
                 taSend.setText(AppConfUtils.get().getProperty(AppConstant.TCP_LAST_SEND));
             } else {
                 cIp.setModel(new DefaultComboBoxModel<>(AppConfUtils.getHosts(AppConstant.UDP_HOST)));
-                String ip = (String) cIp.getSelectedItem();
-                tPort.setText(AppConfUtils.getPort(AppConstant.UDP_HOST, ip));
+                tPort.setText(AppConfUtils.getPort(AppConstant.UDP_HOST, cIp.getSelectedIndex()));
                 taSend.setText(AppConfUtils.get().getProperty(AppConstant.UDP_LAST_SEND));
             }
         } catch (IOException e) {
@@ -206,11 +202,9 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
     private void changeIp(JTextField tPort) {
         try {
             if (client instanceof TcpClient) {
-                String ip = (String) cIp.getSelectedItem();
-                tPort.setText(AppConfUtils.getPort(AppConstant.TCP_HOST, ip));
+                tPort.setText(AppConfUtils.getPort(AppConstant.TCP_HOST, cIp.getSelectedIndex()));
             } else {
-                String ip = (String) cIp.getSelectedItem();
-                tPort.setText(AppConfUtils.getPort(AppConstant.UDP_HOST, ip));
+                tPort.setText(AppConfUtils.getPort(AppConstant.UDP_HOST, cIp.getSelectedIndex()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -246,6 +240,9 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
 
     @Override
     public void updateIpArray(String[] ipArray) {
+        if (ipArray.length == cIp.getItemCount()) {
+            return;
+        }
         cIp.setModel(new DefaultComboBoxModel<>(ipArray));
     }
 }

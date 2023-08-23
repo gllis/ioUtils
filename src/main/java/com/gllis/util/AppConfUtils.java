@@ -63,8 +63,8 @@ public class AppConfUtils {
      * @param key
      * @return
      */
-    public static String getPort(String key, String ip) {
-        if (ip == null) {
+    public static String getPort(String key, Integer index) {
+        if (index == null) {
             return null;
         }
         String port = null;
@@ -72,13 +72,11 @@ public class AppConfUtils {
             String value = get().getProperty(key);
             if (!StringUtil.isNullOrEmpty(value)) {
                 String[] tmpArr = value.split(",", 5);
-                for (String tmp : tmpArr) {
-                    String[] ips = tmp.split(":");
-                    if (ip.equals(ips[0])) {
-                        port = ips[1];
-                        break;
-                    }
+                if (index > tmpArr.length) {
+                    return null;
                 }
+                String[] ips = tmpArr[index].split(":");
+                port = ips[1];
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
