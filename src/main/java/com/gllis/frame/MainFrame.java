@@ -3,7 +3,9 @@ package com.gllis.frame;
 import com.gllis.conf.UiConstant;
 import com.gllis.dialog.AboutDialog;
 import com.gllis.form.HexToolForm;
+import com.gllis.form.MqttClientForm;
 import com.gllis.form.NetClientForm;
+import com.gllis.net.MQTTClient;
 import com.gllis.net.TcpClient;
 import com.gllis.net.UdpClient;
 import com.gllis.util.SystemUtil;
@@ -38,6 +40,7 @@ public class MainFrame extends JFrame {
 
         this.tabbedPane.add("TCP客户端", new NetClientForm(new TcpClient().create()));
         this.tabbedPane.add("UDP客户端", new NetClientForm(new UdpClient().create()));
+        this.tabbedPane.add("MQTT客户端", new MqttClientForm(new MQTTClient()));
         this.tabbedPane.add("16进制转换", new HexToolForm());
 
         JPanel contentPanel = new JPanel(new BorderLayout());

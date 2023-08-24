@@ -5,12 +5,9 @@ import com.gllis.util.AppConfUtils;
 import com.gllis.util.HexUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -20,7 +17,6 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.util.internal.StringUtil;
 
 import java.net.InetSocketAddress;
-import java.text.MessageFormat;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -55,10 +51,6 @@ public class UdpClient implements Client {
         return this;
     }
 
-    @Override
-    public String getHostInfo() {
-        return MessageFormat.format("{0}:{1}", host, String.valueOf(port));
-    }
 
     public Client create() {
         this.workerGroup = new NioEventLoopGroup();
@@ -116,7 +108,7 @@ public class UdpClient implements Client {
             ByteBuf buf = datagramPacket.content();
             byte[] data = new byte[buf.readableBytes()];
             buf.readBytes(data);
-            clientDispatcher.receive(data);
+            clientDispatcher.receive(datagramPacket.recipient().getAddress().toString(), data);
         }
     }
 }

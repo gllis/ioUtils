@@ -64,7 +64,7 @@ public class AppConfUtils {
      * @return
      */
     public static String getPort(String key, Integer index) {
-        if (index == null) {
+        if (index == null || index < 0) {
             return null;
         }
         String port = null;

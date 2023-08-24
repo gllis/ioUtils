@@ -212,15 +212,16 @@ public class NetClientForm extends JPanel implements ClientDispatcher {
     }
 
     @Override
-    public void receive(byte[] data) {
+    public void receive(String address, byte[] data) {
         if (data == null || data.length == 0) {
             return;
         }
+        address = address != null && address.startsWith("/") ? address.substring(1) : address;
         String result = isHexReceive ? HexUtil.convertByteToHex(data) : new String(data);
-        taReceive.append(MessageFormat.format("{0} [{1}]", client.getHostInfo(), DateUtil.now()));
+        taReceive.append(MessageFormat.format("{0} [{1}]", address, DateUtil.now()));
         taReceive.append("\n");
         taReceive.append(result);
-        taReceive.append("\n");
+        taReceive.append("\n\n");
     }
 
     @Override

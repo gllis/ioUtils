@@ -17,4 +17,8 @@ public interface AppConstant {
     String UDP_HOST = "udp.host";
     String UDP_LAST_SEND = "udp.last.send";
 
+    String MQTT_HOST = "mqtt.host";
+    String MQTT_LAST_SEND = "mqtt.last.send";
+    String MQTT_CLIENT_ID = "mqtt.clientId";
+    String MQTT_TOPIC = "mqtt.topic";
 }

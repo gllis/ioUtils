@@ -20,7 +20,6 @@ import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.internal.StringUtil;
 
-import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -51,10 +50,7 @@ public class TcpClient implements Client {
         return this;
     }
 
-    @Override
-    public String getHostInfo() {
-        return MessageFormat.format("{0}:{1}", host, String.valueOf(port));
-    }
+
 
     public TcpClient create() {
         this.workerGroup = new NioEventLoopGroup();
@@ -112,6 +108,7 @@ public class TcpClient implements Client {
                     : content.trim().getBytes();
             channelFuture.channel().writeAndFlush(data);
             AppConfUtils.update(AppConstant.TCP_LAST_SEND, content);
+            clientDispatcher.receive(channelFuture.channel().localAddress().toString(), data);
         } catch (Exception e) {
             e.printStackTrace();
             clientDispatcher.alertMsg("发送失败！");
@@ -144,7 +141,7 @@ public class TcpClient implements Client {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             byte[] data = (byte[]) msg;
-            clientDispatcher.receive(data);
+            clientDispatcher.receive(ctx.channel().remoteAddress().toString(), data);
         }
 
         @Override

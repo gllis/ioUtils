@@ -11,18 +11,21 @@ public interface Client {
     Client setListener(ClientDispatcher clientDispatcher);
 
     /**
-     * 获取主机信息
-     *
-     * @return
-     */
-    String getHostInfo();
-    /**
      * 连接
      *
      * @param host
      * @param port
      */
-    void connect(String host, Integer port);
+    default void connect(String host, Integer port) {};
+
+    /**
+     * 连接
+     *
+     * @param host
+     * @param port
+     * @param clientId
+     */
+    default void connect(String host, Integer port, String clientId) {};
 
     /**
      * 断开连接
@@ -34,7 +37,15 @@ public interface Client {
      *
      * @param content
      */
-    void sendMsg(String content);
+    default void sendMsg(String content) {}
+
+    /**
+     * 发送数据
+     *
+     * @param topic
+     * @param content
+     */
+    default void sendMsg(String topic, String content) {}
 
 
     /**
@@ -42,7 +53,7 @@ public interface Client {
      *
      * @param show
      */
-    void setIsHexSend(boolean show);
+    default void setIsHexSend(boolean show) {};
 
 
 }

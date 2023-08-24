@@ -5,9 +5,10 @@ public interface ClientDispatcher {
     /**
      * 接收数据
      *
+     * @param address
      * @param data
      */
-    void receive(byte[] data);
+    void receive(String address, byte[] data);
 
     /**
      * 已连接
