@@ -43,6 +43,7 @@ public class TcpClient implements Client {
      * 是否使用16进制发送
      */
     private AtomicBoolean isHexSend = new AtomicBoolean(true);
+    private final AtomicBoolean started = new AtomicBoolean();
 
     @Override
     public TcpClient setListener(ClientDispatcher clientDispatcher) {
@@ -52,24 +53,27 @@ public class TcpClient implements Client {
 
 
 
-    public TcpClient create() {
-        this.workerGroup = new NioEventLoopGroup();
-        this.bootstrap = new Bootstrap();
-        bootstrap.group(workerGroup)
-                .channel(NioSocketChannel.class);
-        bootstrap.handler(new ChannelInitializer<Channel>() {
-            @Override
-            public void initChannel(Channel ch) throws Exception {
-                initPipeline(ch.pipeline());
-            }
-        });
-        initOptions(bootstrap);
-        return this;
+    private void create() {
+        if (started.compareAndSet(false, true)) {
+            System.out.println("初始化tcp");
+            this.workerGroup = new NioEventLoopGroup();
+            this.bootstrap = new Bootstrap();
+            bootstrap.group(workerGroup)
+                    .channel(NioSocketChannel.class);
+            bootstrap.handler(new ChannelInitializer<Channel>() {
+                @Override
+                public void initChannel(Channel ch) throws Exception {
+                    initPipeline(ch.pipeline());
+                }
+            });
+            initOptions(bootstrap);
+        }
     }
 
     @Override
     public void connect(String host, Integer port) {
         try {
+            create();
             this.host = host;
             this.port = port;
             channelFuture = bootstrap.connect(host, port).sync();

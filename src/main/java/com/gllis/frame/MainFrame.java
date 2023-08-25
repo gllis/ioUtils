@@ -5,6 +5,7 @@ import com.gllis.dialog.AboutDialog;
 import com.gllis.form.HexToolForm;
 import com.gllis.form.MqttClientForm;
 import com.gllis.form.NetClientForm;
+import com.gllis.form.StringToolForm;
 import com.gllis.net.MQTTClient;
 import com.gllis.net.TcpClient;
 import com.gllis.net.UdpClient;
@@ -38,10 +39,11 @@ public class MainFrame extends JFrame {
         this.tabbedPane = new JTabbedPane();
         this.tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        this.tabbedPane.add("TCP客户端", new NetClientForm(new TcpClient().create()));
-        this.tabbedPane.add("UDP客户端", new NetClientForm(new UdpClient().create()));
-        this.tabbedPane.add("MQTT客户端", new MqttClientForm(new MQTTClient()));
+        this.tabbedPane.add("TCP客户端", new NetClientForm(new TcpClient()));
+        this.tabbedPane.add("UDP客户端", new NetClientForm(new UdpClient()));
+        this.tabbedPane.add("MQTT客户端", new MqttClientForm());
         this.tabbedPane.add("16进制转换", new HexToolForm());
+        this.tabbedPane.add("字符串转换", new StringToolForm());
 
         JPanel contentPanel = new JPanel(new BorderLayout());
         if (SystemUtil.isMacOs()) {

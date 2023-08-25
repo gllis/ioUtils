@@ -7,6 +7,7 @@ import com.gllis.conf.AppConstant;
 import com.gllis.conf.UiConstant;
 import com.gllis.net.Client;
 import com.gllis.net.ClientDispatcher;
+import com.gllis.net.MQTTClient;
 import com.gllis.util.AppConfUtils;
 import com.gllis.util.DateUtil;
 import io.netty.util.internal.StringUtil;
@@ -58,10 +59,10 @@ public class MqttClientForm extends JPanel implements ClientDispatcher {
     /**
      * 客户端
      */
-    private Client client;
+    private final Client client;
 
-    public MqttClientForm(Client client) {
-        this.client = client;
+    public MqttClientForm() {
+        this.client = new MQTTClient();
         this.client.setListener(this);
         try {
             init();

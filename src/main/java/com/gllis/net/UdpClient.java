@@ -44,6 +44,7 @@ public class UdpClient implements Client {
      * 是否使用16进制发送
      */
     private AtomicBoolean isHexSend = new AtomicBoolean(true);
+    private final AtomicBoolean started = new AtomicBoolean();
 
     @Override
     public Client setListener(ClientDispatcher clientDispatcher) {
@@ -52,25 +53,27 @@ public class UdpClient implements Client {
     }
 
 
-    public Client create() {
-        this.workerGroup = new NioEventLoopGroup();
-        this.bootstrap = new Bootstrap();
-        bootstrap.group(workerGroup)
-                .channel(NioDatagramChannel.class)
-                .option(ChannelOption.SO_BROADCAST, true);     // 广播
-        bootstrap.handler(new ClientHandler());
+    public void create() {
+        if (started.compareAndSet(false, true)) {
+            this.workerGroup = new NioEventLoopGroup();
+            this.bootstrap = new Bootstrap();
+            bootstrap.group(workerGroup)
+                    .channel(NioDatagramChannel.class)
+                    .option(ChannelOption.SO_BROADCAST, true);     // 广播
+            bootstrap.handler(new ClientHandler());
 
 
-        try {
-            channelFuture = bootstrap.bind(0).sync();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            try {
+                channelFuture = bootstrap.bind(0).sync();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
-        return this;
     }
 
     @Override
     public void connect(String host, Integer port) {
+        create();
         this.host = host;
         this.port = port;
         AppConfUtils.updateHost(AppConstant.UDP_HOST, host, port);
@@ -88,8 +91,9 @@ public class UdpClient implements Client {
                 : content.trim().getBytes();
         channelFuture.channel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(data),
                 new InetSocketAddress(host, port)));
-        AppConfUtils.update(AppConstant.UDP_LAST_SEND, content);
 
+        AppConfUtils.update(AppConstant.UDP_LAST_SEND, content);
+        clientDispatcher.receive(channelFuture.channel().localAddress().toString(), data);
     }
 
 
@@ -108,7 +112,7 @@ public class UdpClient implements Client {
             ByteBuf buf = datagramPacket.content();
             byte[] data = new byte[buf.readableBytes()];
             buf.readBytes(data);
-            clientDispatcher.receive(datagramPacket.recipient().getAddress().toString(), data);
+            clientDispatcher.receive(datagramPacket.sender().toString(), data);
         }
     }
 }
