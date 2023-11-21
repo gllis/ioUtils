@@ -109,7 +109,7 @@ public class TcpClient implements Client {
         }
         try {
             byte[] data = isHexSend.get() ? HexUtil.convertHexToByte(content.trim().toUpperCase())
-                    : content.trim().getBytes();
+                    : content.getBytes();
             channelFuture.channel().writeAndFlush(data);
             AppConfUtils.update(AppConstant.TCP_LAST_SEND, content);
             clientDispatcher.receive(channelFuture.channel().localAddress().toString(), data);

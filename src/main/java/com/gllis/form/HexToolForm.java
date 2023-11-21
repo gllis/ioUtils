@@ -124,7 +124,7 @@ public class HexToolForm extends JPanel {
                 showMessageDialog(null, "内容不能为空！");
                 return;
             }
-            String ascii = new String(HexUtil.convertHexToByte(content.toUpperCase()));
+            String ascii = new String(HexUtil.convertHexToByte(content.replace(" ", "").toUpperCase()));
             newHexArea.setText(ascii);
         });
         btnToHex.addActionListener(l -> {
